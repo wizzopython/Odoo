@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }
+h1, h2, h3 { color: #333; }
+code { background-color: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
+pre { background-color: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>Complete Beginner's Guide to Odoo &amp; Hikvision Integration</h1>
+<p>Since you are completely new to Odoo, don't worry! This guide will walk you through exactly what Odoo is, where to get it, how to install it on your Windows computer, and how to load the code we just wrote.</p>
+<h2>1. What is Odoo?</h2>
+<p>Odoo is a popular business management software (like an ERP). It runs in your web browser, but it requires a server running in the background on your computer to work. 
+The code you have in your folder (<code>attendance_punching_integration</code>) is known as an <strong>Odoo Addon (or Module)</strong>. It adds specific features (like reading from your Hikvision device) to the base Odoo system.</p>
+<hr />
+<h2>2. Download the Latest Odoo (Version 18)</h2>
+<p>Odoo provides an easy-to-use installer for Windows that bundles everything you need (Python, PostgreSQL database, and the Odoo server).</p>
+<ol>
+<li>Go to the official Odoo download page: <a href="https://www.odoo.com/page/download">https://www.odoo.com/page/download</a></li>
+<li>Fill in your basic details (Name, Company, Email) to unlock the download buttons.</li>
+<li>Under <strong>Odoo 18</strong> (the latest version), click the <strong>Download</strong> button for the <strong>Windows (Community Edition)</strong>. 
+   <em>(Note: Community is free, Enterprise is paid. Community is perfect for what you are doing).</em></li>
+</ol>
+<hr />
+<h2>3. Install Odoo on Windows</h2>
+<ol>
+<li>Once the <code>.exe</code> file downloads, double-click it to start the installation.</li>
+<li>Select your language and click <strong>Next</strong>.</li>
+<li>Agree to the terms.</li>
+<li>On the "Select Components" screen, <strong>make sure both "Odoo Server" and "PostgreSQL Database" are checked</strong>. Click <strong>Next</strong>.</li>
+<li>Keep the default Hostname, Port, Username, and Password for PostgreSQL. <em>(Important: Take a screenshot or write down the PostgreSQL Username and Password just in case, though Odoo usually handles this automatically).</em></li>
+<li>Choose an installation folder (e.g., <code>C:\Program Files\Odoo 18.0</code>) and click <strong>Install</strong>. </li>
+<li>This will take a few minutes. Once done, it will automatically open your web browser to <code>http://localhost:8069</code>.</li>
+</ol>
+<hr />
+<h2>4. Initial Database Setup</h2>
+<p>When your browser opens <code>http://localhost:8069</code>:
+1. You will see a screen asking to create a database.
+2. <strong>Master Password</strong>: This is provided at the top of the screen. Keep it safe!
+3. <strong>Database Name</strong>: Give it a name (e.g., <code>my_company</code>).
+4. <strong>Email</strong>: Enter your email (this will be your admin login username).
+5. <strong>Password</strong>: Create a password (this will be your admin login password).
+6. <strong>Demo Data</strong>: Leave this unchecked.
+7. Click <strong>Create Database</strong>. </p>
+<p>You are now inside Odoo!</p>
+<hr />
+<h2>5. Install Python Dependencies</h2>
+<p>The custom code we wrote needs two Python libraries (<code>requests</code> for Hikvision and <code>zk</code> for ZKTeco) to communicate with the devices. We must install them into Odoo's Python environment.</p>
+<ol>
+<li>Open your Windows <strong>Start Menu</strong>.</li>
+<li>Type <code>cmd</code> to find the <strong>Command Prompt</strong>, right-click it, and select <strong>Run as administrator</strong>.</li>
+<li>In the command prompt, navigate to the Odoo python folder. Assuming you installed it in the default location, type:
+   <code>cmd
+   cd "C:\Program Files\Odoo 18.0\python"</code></li>
+<li>Now, install the required libraries by typing:
+   <code>cmd
+   python -m pip install requests zk</code></li>
+<li>Wait for it to say "Successfully installed...".</li>
+</ol>
+<hr />
+<h2>6. Copy Your Custom Module into Odoo</h2>
+<p>We need to put your <code>attendance_punching_integration</code> folder into the place where Odoo looks for custom apps.</p>
+<ol>
+<li>Open your File Explorer.</li>
+<li>Copy your folder: <code>d:\Research\ASHIQ\Odoo\attendance_punching_integration</code></li>
+<li>Navigate to your Odoo Addons folder. By default, this is:
+   <code>C:\Program Files\Odoo 18.0\server\odoo\addons\</code></li>
+<li>Paste the <code>attendance_punching_integration</code> folder directly inside the <code>addons</code> folder.</li>
+</ol>
+<hr />
+<h2>7. Restart Odoo</h2>
+<p>Because you added a new folder and installed Python packages, Odoo needs a quick restart to notice them.</p>
+<ol>
+<li>Open your Windows <strong>Start Menu</strong>.</li>
+<li>Type <code>Services</code> and open the <strong>Services</strong> app.</li>
+<li>Scroll down the list until you find a service named something like <strong>odoo-server-18.0</strong>.</li>
+<li>Right-click it and click <strong>Restart</strong>.</li>
+</ol>
+<hr />
+<h2>8. Install Your App in Odoo</h2>
+<p>Now we activate your custom code inside the Odoo web interface.</p>
+<ol>
+<li>Go back to your web browser (<code>http://localhost:8069</code>).</li>
+<li>Go to the <strong>Settings</strong> app (if you don't see Settings, go to the top-left menu icon to see all apps).</li>
+<li>Scroll to the very bottom of the Settings page and click <strong>Activate the developer mode</strong>. (A little bug icon will appear at the top of your screen).</li>
+<li>Go to the <strong>Apps</strong> menu (top-left icon -&gt; Apps).</li>
+<li>On the top menu bar, click <strong>Update Apps List</strong> and then click <strong>Update</strong> in the popup.</li>
+<li>Now, go to the search bar on the Apps page. Remove the "Apps" filter, and search for <code>attendance_punching_integration</code>.</li>
+<li>You should see your module appear! Click the <strong>Activate</strong> button on it.</li>
+</ol>
+<hr />
+<h2>9. Configure Your Hikvision Device</h2>
+<p>Now that the app is installed:</p>
+<ol>
+<li>Click the top-left menu icon and you will see a new app called <strong>Attendances</strong> (or <strong>Attendance Punching</strong> depending on the menu layout).</li>
+<li>Go to <strong>Attendance Punching</strong> (or Settings -&gt; Attendance Punching).</li>
+<li>Click <strong>New</strong> to create a device.</li>
+<li><strong>Name</strong>: e.g., "Front Door Scanner"</li>
+<li><strong>Device Type</strong>: Select <strong>Hikvision</strong>.</li>
+<li><strong>Device IP</strong>: Enter the IP address of your Hikvision device (e.g., <code>192.168.1.64</code>).</li>
+<li><strong>Port No</strong>: Usually <code>80</code>.</li>
+<li><strong>Username</strong>: Usually <code>admin</code>.</li>
+<li><strong>Password</strong>: The password you use to log into the Hikvision device's web interface.</li>
+<li>Click the save icon (the cloud icon at the top).</li>
+</ol>
+<h2>10. Fetch Attendance</h2>
+<p>To test it, simply click the <strong>Fetch Attendance</strong> button at the top of the device configuration page. It will reach out to the Hikvision device and pull in all the latest check-in logs!</p>
+</body>
+</html>

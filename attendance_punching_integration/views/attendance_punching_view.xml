@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Employee Inherited-->
+    <record id="view_employee_form" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.hr.fleet</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="60"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']//field[@name='employee_type']" position="after">
+                <field name="device_user_id" string="Punching User Id"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- Tree View -->
+    <record id="view_attendance_punching_tree" model="ir.ui.view">
+        <field name="name">attendance.punching.tree</field>
+        <field name="model">attendance.punching</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="device_ip"/>
+                <field name="device_tcp_com_port"/>
+                <field name="company_id"/>
+                <field name="latest_log"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_attendance_punching_form" model="ir.ui.view">
+        <field name="name">attendance.punching.form</field>
+        <field name="model">attendance.punching</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_fetch_attendance" string="Fetch Attendance"
+                            type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="device_type"/>
+                        <field name="device_ip"/>
+                        <field name="device_tcp_com_port"/>
+                        <field name="device_username" invisible="device_type != 'hikvision'"/>
+                        <field name="device_password" invisible="device_type != 'hikvision'" password="True"/>
+                        <field name="company_id"/>
+                        <field name="latest_log_time"/>
+                        <field name="latest_log" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to Open Views -->
+    <record id="action_attendance_punching" model="ir.actions.act_window">
+        <field name="name">Attendance Punching</field>
+        <field name="res_model">attendance.punching</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_attendance_punching_tree"/>
+        <field name="help" type="html">
+            <p>Create and manage your attendance punching devices.</p>
+        </field>
+    </record>
+
+    <!-- Menu Item (Submenu) -->
+    <menuitem id="menu_attendance_punching"
+              name="Attendance Punching"
+              parent="hr_attendance.menu_hr_attendance_settings"
+              action="action_attendance_punching"
+              sequence="10"/>
+</odoo>
