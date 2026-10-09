@@ -1,0 +1,5 @@
+# Install using Odoo's own python.exe, not the system Python.
+requests>=2.31.0
+pytz
+# Distribution is pyzk; its Python import is `from zk import ZK`.
+pyzk==0.9

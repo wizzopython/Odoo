@@ -3,17 +3,57 @@
 
     <!-- Employee Inherited-->
     <record id="view_employee_form" model="ir.ui.view">
-        <field name="name">hr.employee.form.inherit.hr.fleet</field>
+        <field name="name">hr.employee.form.attendance.punching</field>
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="priority" eval="60"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='hr_settings']//field[@name='employee_type']" position="after">
+            <xpath expr="//page[@name='hr_settings']//group[@name='identification_group']" position="inside">
                 <field name="device_user_id" string="Punching User Id"/>
             </xpath>
         </field>
     </record>
 
+
+    <!-- Attendances: show days with a missing device punch -->
+    <record id="view_attendance_tree_punch_issue" model="ir.ui.view">
+        <field name="name">hr.attendance.list.punch.issue</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <!-- Forgot to check out: show the checkout cell blank. Odoo allows only
+                 one open attendance per employee, so the stored value stays equal
+                 to the check-in (0 hours) and only the display is blank. -->
+            <field name="check_out" position="attributes">
+                <attribute name="invisible">punch_issue == 'missing_checkout'</attribute>
+            </field>
+            <field name="check_out" position="after">
+                <field name="punch_issue" widget="badge" decoration-warning="punch_issue"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_form_punch_issue" model="ir.ui.view">
+        <field name="name">hr.attendance.form.punch.issue</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <field name="check_out" position="after">
+                <field name="punch_issue" invisible="not punch_issue"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="hr_attendance_view_filter_punch_issue" model="ir.ui.view">
+        <field name="name">hr.attendance.search.punch.issue</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <filter name="auto_check" position="after">
+                <filter string="Missing Punch" name="missing_punch" domain="[('punch_issue', '!=', False)]"/>
+            </filter>
+        </field>
+    </record>
 
     <!-- Tree View -->
     <record id="view_attendance_punching_tree" model="ir.ui.view">
@@ -22,6 +62,7 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
+                <field name="device_type"/>
                 <field name="device_ip"/>
                 <field name="device_tcp_com_port"/>
                 <field name="company_id"/>
@@ -46,9 +87,29 @@
                         <field name="device_type"/>
                         <field name="device_ip"/>
                         <field name="device_tcp_com_port"/>
-                        <field name="device_username" invisible="device_type != 'hikvision'"/>
-                        <field name="device_password" invisible="device_type != 'hikvision'" password="True"/>
-                        <field name="company_id"/>
+                        <field name="device_timezone"/>
+                        <field name="allow_overnight"/>
+                        <field name="zk_password" invisible="device_type != 'zkteco'"/>
+                        <field name="use_https" invisible="device_type not in ('hikvision', 'dahua')"/>
+                        <field name="device_username" invisible="device_type not in ('hikvision', 'dahua')"/>
+                        <field name="device_password" invisible="device_type not in ('hikvision', 'dahua')" password="True"/>
+                        <div class="text-muted" colspan="2" invisible="device_type != 'dahua'">
+                            Dahua uses the device HTTP/HTTPS port and CGI access records.
+                            Entry is imported as Check In; Exit as Check Out. Confirm the device's
+                            reader directions match employee attendance. Failed access attempts are ignored.
+                        </div>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="active"/>
+                        <field name="import_since"/>
+                        <div class="text-muted" colspan="2">
+                            Fetch Attendance reads from Import From up to now. It imports older pairs,
+                            saves today's check-in, and adds checkout when available.
+                            Punches on different dates are not paired unless overnight shifts are enabled.
+                            Only active employees with a matching Punching User ID in this company are imported.
+                            Fetch opens the Attendances dashboard. A past day with only a check-in or only a checkout
+                            is shown with both times equal to that punch and marked Missing Check-out / Missing Check-in.
+                            Correcting its times clears the mark.
+                        </div>
                         <field name="latest_log_time"/>
                         <field name="latest_log" readonly="1"/>
                     </group>
@@ -71,7 +132,8 @@
     <!-- Menu Item (Submenu) -->
     <menuitem id="menu_attendance_punching"
               name="Attendance Punching"
-              parent="hr_attendance.menu_hr_attendance_settings"
+              parent="hr_attendance.menu_hr_attendance_configuration"
+              groups="hr_attendance.group_hr_attendance_manager"
               action="action_attendance_punching"
               sequence="10"/>
 </odoo>
